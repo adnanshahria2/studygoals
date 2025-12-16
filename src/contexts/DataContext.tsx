@@ -18,6 +18,7 @@ interface DataContextType {
     addCard: (tableId: 'table1' | 'table2', date: string) => void;
     deleteCard: (tableId: string, date: string) => void;
     addTargetCard: (title: string, startDate: string, endDate: string) => string;
+    updateTargetCard: (cardId: string, updates: { title?: string; startDate?: string; endDate?: string }) => void;
     deleteTargetCard: (cardId: string) => void;
 }
 
@@ -196,6 +197,17 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return cardId;
     }, [completedTopics, debouncedSave]);
 
+    const updateTargetCard = useCallback((cardId: string, updates: { title?: string; startDate?: string; endDate?: string }) => {
+        setTableData((prev) => {
+            const updated = JSON.parse(JSON.stringify(prev)) as TableData;
+            updated.targetCards = (updated.targetCards || []).map(card =>
+                card.id === cardId ? { ...card, ...updates } : card
+            );
+            debouncedSave(updated, completedTopics);
+            return updated;
+        });
+    }, [completedTopics, debouncedSave]);
+
     const deleteTargetCard = useCallback((cardId: string) => {
         setTableData((prev) => {
             const updated = JSON.parse(JSON.stringify(prev)) as TableData;
@@ -220,7 +232,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         <DataContext.Provider value={{
             tableData, completedTopics, settings, isLoading,
             updateTopic, addTopic, deleteTopic, updateTableData, updateSettings, addCard, deleteCard,
-            addTargetCard, deleteTargetCard
+            addTargetCard, updateTargetCard, deleteTargetCard
         }}>
             {children}
         </DataContext.Provider>

@@ -9,12 +9,13 @@ interface TargetCardProps {
     completedTopics: Record<string, Topic>;
     onAddTopic: (tableId: string, cardId: string) => void;
     onEditTopic: (topicId: string) => void;
+    onEditCard: (cardMeta: TargetCardMeta) => void;
     onDeleteCard: (cardId: string) => void;
 }
 
 export const TargetCard: React.FC<TargetCardProps> = ({
     cardMeta, dateData, completedTopics,
-    onAddTopic, onEditTopic, onDeleteCard
+    onAddTopic, onEditTopic, onEditCard, onDeleteCard
 }) => {
     const columns = COLUMN_HEADERS.table1;
 
@@ -74,6 +75,17 @@ export const TargetCard: React.FC<TargetCardProps> = ({
                         <span className="text-accent-purple">🎯</span>
                         {cardMeta.title}
                     </h3>
+
+                    {/* Edit button */}
+                    <button
+                        onClick={() => onEditCard(cardMeta)}
+                        className="p-1.5 text-gray-400 hover:text-accent-purple hover:bg-accent-purple/10 rounded-lg transition-all"
+                        title="Edit target"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                    </button>
 
                     {/* Delete button (Mobile only - right aligned on top row) */}
                     <button
