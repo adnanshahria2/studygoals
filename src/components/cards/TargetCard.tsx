@@ -108,14 +108,19 @@ export const TargetCard: React.FC<TargetCardProps> = ({
                     </span>
 
                     <div className="flex items-center gap-2">
-                        {/* Days Badge */}
+                        {/* Total Days Badge */}
+                        <span className="font-bold px-2 py-1 rounded-lg bg-gray-500/20 text-gray-300" title="Total days">
+                            {daysInfo.totalDays}d
+                        </span>
+
+                        {/* Days Remaining Badge */}
                         <span className={`font-bold px-2 py-1 rounded-lg ${daysInfo.daysRemaining <= 3
                             ? 'bg-red-500/20 text-red-400'
                             : daysInfo.daysRemaining <= 7
                                 ? 'bg-yellow-500/20 text-yellow-400'
                                 : 'bg-accent-blue/20 text-accent-blue'
-                            }`}>
-                            {daysInfo.daysRemaining}d
+                            }`} title="Days remaining">
+                            {daysInfo.daysRemaining}d left
                         </span>
 
                         {/* Progress Badge */}
