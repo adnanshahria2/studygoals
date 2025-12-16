@@ -20,7 +20,7 @@ type MobileTabType = 'dashboard' | 'targets' | 'daily' | 'settings';
 export const Dashboard: React.FC = () => {
     const { user, logout } = useAuth();
     const { tableData, completedTopics, addCard, deleteCard, deleteTopic, updateTableData, addTargetCard, deleteTargetCard, settings } = useData();
-    const { days, hours, minutes, seconds } = useCountdown(settings.countdownSettings);
+    const { days } = useCountdown(settings.countdownSettings);
 
     const [view, setView] = useState<ViewMode>('table1');
     const [activeMobileTab, setActiveMobileTab] = useState<MobileTabType>('dashboard');
@@ -97,38 +97,6 @@ export const Dashboard: React.FC = () => {
         ).sort((a, b) => new Date(a.endDate).getTime() - new Date(b.endDate).getTime());
     }, [tableData.targetCards]);
 
-    const stats = useMemo(() => {
-        const activeTopicIds = new Set<string>();
-
-        (tableData.targetCards || []).forEach(card => {
-            const data = tableData.table1[card.id] || {};
-            Object.values(data || {}).forEach(columnTopics => {
-                if (Array.isArray(columnTopics)) {
-                    columnTopics.forEach(id => activeTopicIds.add(id));
-                }
-            });
-        });
-
-        Object.values(tableData.table2).forEach(dateColumns => {
-            Object.values(dateColumns).forEach(columnTopics => {
-                if (Array.isArray(columnTopics)) {
-                    columnTopics.forEach(id => activeTopicIds.add(id));
-                }
-            });
-        });
-
-        let total = 0, completed = 0;
-        activeTopicIds.forEach(id => {
-            const topic = completedTopics[id];
-            if (topic) {
-                total++;
-                if (topic.progress === 100) completed++;
-            }
-        });
-
-        return { total, completed, pct: total > 0 ? (completed / total) * 100 : 0 };
-    }, [tableData, completedTopics]);
-
     const existingDates = useMemo(() =>
         Object.keys(tableData.table1).concat(Object.keys(tableData.table2)),
         [tableData]
@@ -159,9 +127,7 @@ export const Dashboard: React.FC = () => {
         setShowCreateTarget(false);
     };
 
-    const handleDeleteTarget = (cardId: string) => {
-        deleteTargetCard(cardId);
-    };
+
 
     return (
         <div className="min-h-screen bg-bg-dark text-white font-sans selection:bg-accent-purple/30 pb-24 md:pb-0">

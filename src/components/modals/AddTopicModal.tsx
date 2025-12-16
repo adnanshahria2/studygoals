@@ -27,7 +27,7 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({ isOpen, onClose, t
     const targetCardMatch = tableId === 'table2' ? (tableData.targetCards || []).find(card => {
         const start = new Date(card.startDate);
         const end = new Date(card.endDate);
-        const current = new Date(date.split('/').reverse().join('-')); // assuming date is DD/MM/YYYY or YYYY-MM-DD. Let's check format.
+
         // Actually, date passed to modal from DateCard is likely YYYY-MM-DD.
         // Let's use simple string comparison if format matches, or Date objects.
         // Safer to use Date objects.
