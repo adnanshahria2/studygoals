@@ -84,7 +84,7 @@ export default defineConfig({
       }
     })
   ],
-  base: './',
+  base: '/studygoals/',
   resolve: {
     alias: {
       '@': '/src'
