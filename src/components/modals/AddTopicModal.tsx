@@ -68,7 +68,10 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({ isOpen, onClose, t
         onClose();
     };
 
-    const columns = COLUMN_HEADERS[tableId as keyof typeof COLUMN_HEADERS];
+    const columns = tableId === 'table1'
+        ? (settings.subjects && settings.subjects.length > 0 ? settings.subjects : COLUMN_HEADERS.table1)
+        : COLUMN_HEADERS[tableId as keyof typeof COLUMN_HEADERS];
+
     const columnOptions = columns.map((c) => ({ value: c, label: c }));
     const hardnessOptions = [
         { value: 'easy', label: 'Easy' },
@@ -175,7 +178,10 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({ isOpen, onClose, t
                         <Dropdown
                             options={[
                                 { value: '', label: 'Do not link' },
-                                ...COLUMN_HEADERS.table1.map(c => ({ value: c, label: c }))
+                                ...(settings.subjects && settings.subjects.length > 0
+                                    ? settings.subjects
+                                    : COLUMN_HEADERS.table1
+                                ).map(c => ({ value: c, label: c }))
                             ]}
                             value={targetSubject}
                             onChange={setTargetSubject}

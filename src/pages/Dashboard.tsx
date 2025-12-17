@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { DateCard } from '@/components/cards/DateCard';
 import { TargetCard } from '@/components/cards/TargetCard';
 import { BottomNav } from '@/components/layout/BottomNav';
@@ -22,8 +22,20 @@ export const Dashboard: React.FC = () => {
     const { tableData, completedTopics, addCard, deleteCard, deleteTopic, updateTableData, addTargetCard, deleteTargetCard, settings } = useData();
     const { days } = useCountdown(settings.countdownSettings);
 
-    const [view, setView] = useState<ViewMode>('table1');
-    const [activeMobileTab, setActiveMobileTab] = useState<MobileTabType>('dashboard');
+    const [view, setView] = useState<ViewMode>(() => {
+        return (localStorage.getItem('view') as ViewMode) || 'table1';
+    });
+    const [activeMobileTab, setActiveMobileTab] = useState<MobileTabType>(() => {
+        return (localStorage.getItem('activeMobileTab') as MobileTabType) || 'dashboard';
+    });
+
+    useEffect(() => {
+        localStorage.setItem('view', view);
+    }, [view]);
+
+    useEffect(() => {
+        localStorage.setItem('activeMobileTab', activeMobileTab);
+    }, [activeMobileTab]);
     const [showSettings, setShowSettings] = useState(false);
     const [showCalendar, setShowCalendar] = useState(false);
     const [showCreateTarget, setShowCreateTarget] = useState(false);
