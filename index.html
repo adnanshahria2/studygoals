@@ -29,6 +29,43 @@
             alert('Unhandled Promise: ' + event.reason);
         });
     </script>
+    <script>
+        // Diagnostic: Check if basic JS execution works
+        document.addEventListener('DOMContentLoaded', function () {
+            var loading = document.getElementById('loading-screen');
+            if (loading) {
+                loading.innerHTML += '<div style="color:lime;margin-top:20px;font-size:12px;">✓ Basic JS works</div>';
+            }
+
+            // Try to detect why module might fail
+            setTimeout(function () {
+                // If we're still on loading screen after 5 seconds, module failed
+                if (document.getElementById('loading-screen')) {
+                    var msg = 'Module failed to execute. Checking file...';
+                    loading.innerHTML += '<div style="color:orange;margin-top:10px;font-size:10px;">' + msg + '</div>';
+
+                    // Check if the JS file exists
+                    var scripts = document.querySelectorAll('script[type="module"]');
+                    if (scripts.length > 0) {
+                        var src = scripts[0].src;
+                        loading.innerHTML += '<div style="color:gray;margin-top:5px;font-size:8px;">Trying: ' + src + '</div>';
+
+                        fetch(src)
+                            .then(function (r) {
+                                if (!r.ok) {
+                                    loading.innerHTML += '<div style="color:red;">File error: ' + r.status + '</div>';
+                                } else {
+                                    loading.innerHTML += '<div style="color:yellow;">File exists but module crashed. Check console.</div>';
+                                }
+                            })
+                            .catch(function (e) {
+                                loading.innerHTML += '<div style="color:red;">Network error: ' + e.message + '</div>';
+                            });
+                    }
+                }
+            }, 5000);
+        });
+    </script>
 </head>
 
 <body>
