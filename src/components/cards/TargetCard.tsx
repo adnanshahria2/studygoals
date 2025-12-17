@@ -191,6 +191,11 @@ export const TargetCard: React.FC<TargetCardProps> = ({
                                                         {topic.note}
                                                     </span>
                                                 )}
+                                                {topic.timedNote && (
+                                                    <span className="text-[10px] text-accent-orange truncate font-mono flex items-center gap-1 mt-0.5">
+                                                        <span className="text-xs">📝</span> {topic.timedNote}
+                                                    </span>
+                                                )}
                                                 {topic.estimatedTime && (
                                                     <span className="text-[10px] text-accent-purple truncate font-mono flex items-center gap-1 mt-0.5">
                                                         <span className="text-xs">⏰</span> {topic.estimatedTime}

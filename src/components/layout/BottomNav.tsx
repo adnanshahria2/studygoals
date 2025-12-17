@@ -49,7 +49,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange }) 
     ] as const;
 
     return (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-bg-card/95 backdrop-blur-xl border-t border-white/10 rounded-t-2xl flex items-center justify-around shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.3)] z-50 pt-2 pb-[calc(env(safe-area-inset-bottom)+8px)] animate-slideUp">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-bg-card border-t border-white/10 flex items-center justify-around shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.3)] z-50 pt-3 pb-[env(safe-area-inset-bottom)] animate-slideUp">
             {navItems.map((item) => (
                 <button
                     key={item.id}
