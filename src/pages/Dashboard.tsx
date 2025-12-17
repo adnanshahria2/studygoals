@@ -201,8 +201,7 @@ export const Dashboard: React.FC = () => {
                                     </svg>
                                 </div>
                                 <div className="flex-1">
-                                    <div className="flex justify-between text-sm mb-1">
-                                        <span className="text-gray-400">Total Marks</span>
+                                    <div className="flex justify-end text-sm mb-1">
                                         <span className="font-mono font-bold text-accent-green">{totalMarksAchieved}/{totalMarksPossible}</span>
                                     </div>
                                     <div className="h-2 bg-black/40 rounded-full overflow-hidden">
