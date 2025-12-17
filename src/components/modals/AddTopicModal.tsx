@@ -18,9 +18,10 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({ isOpen, onClose, t
     const [name, setName] = useState('');
     const [timedNote, setTimedNote] = useState('');
     const [estimatedTime, setEstimatedTime] = useState('');
-    const [column, setColumn] = useState(COLUMN_HEADERS[tableId as keyof typeof COLUMN_HEADERS][0]);
+    const defaultColumns = COLUMN_HEADERS[tableId as keyof typeof COLUMN_HEADERS] || COLUMN_HEADERS.table2;
+    const [column, setColumn] = useState(defaultColumns[0] || '');
     const [hardness, setHardness] = useState('medium');
-    const [studyStatus, setStudyStatus] = useState(settings.customStudyTypes[0]?.key || '');
+    const [studyStatus, setStudyStatus] = useState(settings.customStudyTypes?.[0]?.key || 'new');
     const [priority, setPriority] = useState<'high' | 'medium' | 'low'>('low');
 
     // Sync Logic: Check if current date falls within any Target Card

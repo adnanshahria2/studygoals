@@ -23,18 +23,30 @@ export const Dashboard: React.FC = () => {
     const { days } = useCountdown(settings.countdownSettings);
 
     const [view, setView] = useState<ViewMode>(() => {
-        return (localStorage.getItem('view') as ViewMode) || 'table1';
+        try {
+            return (localStorage.getItem('view') as ViewMode) || 'table1';
+        } catch {
+            return 'table1';
+        }
     });
     const [activeMobileTab, setActiveMobileTab] = useState<MobileTabType>(() => {
-        return (localStorage.getItem('activeMobileTab') as MobileTabType) || 'dashboard';
+        try {
+            return (localStorage.getItem('activeMobileTab') as MobileTabType) || 'dashboard';
+        } catch {
+            return 'dashboard';
+        }
     });
 
     useEffect(() => {
-        localStorage.setItem('view', view);
+        try {
+            localStorage.setItem('view', view);
+        } catch { /* Ignore in private browsing */ }
     }, [view]);
 
     useEffect(() => {
-        localStorage.setItem('activeMobileTab', activeMobileTab);
+        try {
+            localStorage.setItem('activeMobileTab', activeMobileTab);
+        } catch { /* Ignore in private browsing */ }
     }, [activeMobileTab]);
     const [showSettings, setShowSettings] = useState(false);
     const [showCalendar, setShowCalendar] = useState(false);

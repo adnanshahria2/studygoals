@@ -34,6 +34,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [isLoading, setIsLoading] = useState(true);
 
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const pendingLocalChangeRef = useRef<boolean>(false);
 
     // Subscribe to data when user changes
     useEffect(() => {
@@ -50,6 +51,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const unsubData = subscribeToData(
             user.email,
             (data) => {
+                // Skip remote updates if we have pending local changes
+                if (pendingLocalChangeRef.current) {
+                    return;
+                }
                 setTableData(data.tableData);
                 setCompletedTopics(data.completedTopics);
                 setIsLoading(false);
@@ -73,10 +78,11 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         };
     }, [user, showToast]);
 
-    // Debounced save
+    // Debounced save with pending flag
     const debouncedSave = useCallback((newTableData: TableData, newTopics: CompletedTopics) => {
         if (!user) return;
 
+        pendingLocalChangeRef.current = true;
         if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
 
         saveTimeoutRef.current = setTimeout(async () => {
@@ -86,17 +92,23 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 showToast('success', 'Synced');
             } catch (error) {
                 showToast('error', 'Sync failed');
+            } finally {
+                pendingLocalChangeRef.current = false;
             }
         }, 1000);
     }, [user, showToast]);
 
     const updateTopic = useCallback((topicId: string, updates: Partial<Topic>) => {
-        setCompletedTopics((prev) => {
-            const updated = { ...prev, [topicId]: { ...prev[topicId], ...updates } };
-            debouncedSave(tableData, updated);
+        setCompletedTopics((prevTopics) => {
+            const updated = { ...prevTopics, [topicId]: { ...prevTopics[topicId], ...updates } };
+            // Use functional update to get current tableData
+            setTableData(currentTableData => {
+                debouncedSave(currentTableData, updated);
+                return currentTableData;
+            });
             return updated;
         });
-    }, [tableData, debouncedSave]);
+    }, [debouncedSave]);
 
     const addTopic = useCallback((tableId: string, cardId: string, column: string, topic: Topic, customTopicId?: string): string => {
         const topicId = customTopicId || `topic_${Date.now().toString(36)}${Math.random().toString(36).substr(2, 9)}`;
@@ -157,8 +169,12 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const updateTableData = useCallback((newTableData: TableData) => {
         setTableData(newTableData);
-        debouncedSave(newTableData, completedTopics);
-    }, [completedTopics, debouncedSave]);
+        // Use functional update to get current completedTopics
+        setCompletedTopics(currentTopics => {
+            debouncedSave(newTableData, currentTopics);
+            return currentTopics;
+        });
+    }, [debouncedSave]);
 
     const updateSettings = useCallback(async (newSettings: AppSettings) => {
         if (!user) return;
