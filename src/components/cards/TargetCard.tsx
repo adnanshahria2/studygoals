@@ -168,7 +168,7 @@ export const TargetCard: React.FC<TargetCardProps> = ({
                     return (
                         <div key={col} className="bg-gray-800/40 rounded-lg p-2 md:p-2 min-h-[60px] border border-white/5">
                             <h4 className="text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide px-1 md:px-0">{col}</h4>
-                            <div className="space-y-2 md:space-y-0 md:flex md:flex-row md:flex-wrap md:gap-3">
+                            <div className="space-y-2 md:space-y-0 md:grid md:grid-cols-2 md:gap-3">
                                 {(dateData[col] || []).map((topicId) => {
                                     const topic = completedTopics[topicId];
                                     if (!topic) return null;
@@ -176,7 +176,7 @@ export const TargetCard: React.FC<TargetCardProps> = ({
                                         <div
                                             key={topicId}
                                             onClick={(e) => handleProgressClick(e, topic, topicId)}
-                                            className="w-full md:w-72 text-left p-2 bg-bg-card border border-border rounded-lg hover:border-accent-purple transition-all group flex items-center gap-2 cursor-pointer relative pr-8"
+                                            className="w-full text-left p-2 bg-bg-card border border-border rounded-lg hover:border-accent-purple transition-all group flex items-center gap-2 cursor-pointer relative pr-8"
                                         >
                                             <div
                                                 className={`w-3 h-3 rounded-full flex-shrink-0 transition-colors mt-1 ${topic.progress === 100 ? 'bg-green-500' : 'bg-gray-600'
