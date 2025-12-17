@@ -105,14 +105,10 @@ export const Dashboard: React.FC = () => {
         });
     }, [tableData.table2]);
 
-    // Filter to only show dates with topics
+    // Mobile view should show all dates, including newly created empty ones
     const sortedDailyDatesMobile = useMemo(() => {
-        return sortedDailyDates.filter(date => {
-            const dateData = tableData.table2[date];
-            if (!dateData) return false;
-            return Object.values(dateData).some(arr => Array.isArray(arr) && arr.length > 0);
-        });
-    }, [sortedDailyDates, tableData.table2]);
+        return sortedDailyDates;
+    }, [sortedDailyDates]);
 
     // Get valid target cards
     const validTargetCards = useMemo(() => {

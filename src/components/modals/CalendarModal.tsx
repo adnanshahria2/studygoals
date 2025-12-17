@@ -69,7 +69,13 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, o
                     <button
                         key={day}
                         disabled={isPast(day)}
-                        onClick={() => { onSelectDate(formatDate(day)); onClose(); }}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onSelectDate(formatDate(day));
+                            // Small delay to ensure state update starts before unmount logic
+                            setTimeout(onClose, 0);
+                        }}
                         className={`
               p-2 text-center rounded-lg transition-all relative
               ${isPast(day) ? 'text-gray-600 cursor-not-allowed' : 'hover:bg-bg-hover cursor-pointer'}
