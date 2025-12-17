@@ -31,7 +31,12 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({ isOpen, onClose, t
         // Actually, date passed to modal from DateCard is likely YYYY-MM-DD.
         // Let's use simple string comparison if format matches, or Date objects.
         // Safer to use Date objects.
-        const d = new Date(date);
+        // Parse date safely
+        let d = new Date(date);
+        if (isNaN(d.getTime()) && date.includes('/')) {
+            const [day, month, year] = date.split('/').map(Number);
+            d = new Date(year, month - 1, day);
+        }
         return d >= start && d <= end;
     }) : undefined;
 
