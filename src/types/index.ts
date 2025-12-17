@@ -47,6 +47,7 @@ export interface CountdownSettings {
 export interface AppSettings {
     customStudyTypes: StudyType[];
     countdownSettings: CountdownSettings;
+    subjects: string[];
 }
 
 // User Types

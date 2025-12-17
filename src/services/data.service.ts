@@ -51,7 +51,8 @@ export const subscribeToSettings = (
                 const data = snapshot.data() as AppSettings;
                 onSettings({
                     customStudyTypes: data.customStudyTypes || DEFAULT_SETTINGS.customStudyTypes,
-                    countdownSettings: data.countdownSettings || DEFAULT_SETTINGS.countdownSettings
+                    countdownSettings: data.countdownSettings || DEFAULT_SETTINGS.countdownSettings,
+                    subjects: data.subjects || DEFAULT_SETTINGS.subjects
                 });
             } else {
                 onSettings({ ...DEFAULT_SETTINGS });

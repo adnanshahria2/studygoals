@@ -15,12 +15,14 @@ export const SettingsContent: React.FC<SettingsContentProps> = ({ onLogout }) =>
 
     // Local state for forms
     const [studyTypes, setStudyTypes] = useState<StudyType[]>([]);
+    const [subjects, setSubjects] = useState<string[]>([]);
     const [countdownTitle, setCountdownTitle] = useState('');
     const [countdownDate, setCountdownDate] = useState('');
     const [countdownTime, setCountdownTime] = useState('');
 
     useEffect(() => {
         setStudyTypes(settings.customStudyTypes || []);
+        setSubjects(settings.subjects || []);
         setCountdownTitle(settings.countdownSettings.title);
         setCountdownDate(settings.countdownSettings.targetDate);
         setCountdownTime(settings.countdownSettings.targetTime);
@@ -29,6 +31,25 @@ export const SettingsContent: React.FC<SettingsContentProps> = ({ onLogout }) =>
     const handleSaveStudyTypes = () => {
         const validTypes = studyTypes.filter((t) => t.name.trim());
         updateSettings({ ...settings, customStudyTypes: validTypes });
+    };
+
+    const handleSaveSubjects = () => {
+        const validSubjects = subjects.filter((s) => s.trim());
+        updateSettings({ ...settings, subjects: validSubjects });
+    };
+
+    const addSubject = () => {
+        setSubjects([...subjects, '']);
+    };
+
+    const removeSubject = (index: number) => {
+        setSubjects(subjects.filter((_, i) => i !== index));
+    };
+
+    const updateSubject = (index: number, value: string) => {
+        const newSubjects = [...subjects];
+        newSubjects[index] = value;
+        setSubjects(newSubjects);
     };
 
     const handleSaveCountdown = () => {
@@ -111,47 +132,94 @@ export const SettingsContent: React.FC<SettingsContentProps> = ({ onLogout }) =>
 
                 {/* Customizations Tab */}
                 {activeTab === 'custom' && (
-                    <div className="space-y-5 animate-fadeIn">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-xl font-bold text-white">Study Types</h2>
-                            <Button variant="success" onClick={handleSaveStudyTypes} className="px-4 py-1.5 text-sm">Save Changes</Button>
-                        </div>
-                        <p className="text-gray-400 text-xs">Define your custom study categories (e.g., Theory, Practical).</p>
+                    <div className="space-y-8 animate-fadeIn">
+                        {/* Subjects Section */}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-xl font-bold text-white">Target Subjects</h2>
+                                <Button variant="success" onClick={handleSaveSubjects} className="px-4 py-1.5 text-sm">Save Subjects</Button>
+                            </div>
+                            <p className="text-gray-400 text-xs">Manage the subjects for your Target cards.</p>
 
-                        <div className="space-y-2.5">
-                            {studyTypes.map((type) => (
-                                <div key={type.key} className="flex gap-2 group">
-                                    <div className="flex-1 relative">
-                                        <input
-                                            type="text"
-                                            value={type.name}
-                                            onChange={(e) => setStudyTypes(studyTypes.map((t) => t.key === type.key ? { ...t, name: e.target.value } : t))}
-                                            className="w-full px-3 py-2.5 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:border-accent-blue focus:ring-1 focus:ring-accent-blue transition-all"
-                                            placeholder="Type Name (e.g. Lab Work)"
-                                        />
-                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-accent-blue/50"></div>
+                            <div className="space-y-2.5">
+                                {subjects.map((sub, index) => (
+                                    <div key={index} className="flex gap-2 group">
+                                        <div className="flex-1 relative">
+                                            <input
+                                                type="text"
+                                                value={sub}
+                                                onChange={(e) => updateSubject(index, e.target.value)}
+                                                className="w-full px-3 py-2.5 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:border-accent-purple focus:ring-1 focus:ring-accent-purple transition-all"
+                                                placeholder="Subject Name (e.g. Physics)"
+                                            />
+                                        </div>
+                                        <button
+                                            onClick={() => removeSubject(index)}
+                                            className="p-2.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all border border-transparent hover:border-red-500/20"
+                                            title="Remove"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
                                     </div>
-                                    <button
-                                        onClick={() => removeStudyType(type.key)}
-                                        className="p-2.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all border border-transparent hover:border-red-500/20"
-                                        title="Remove"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            ))}
-                            {studyTypes.length === 0 && (
-                                <div className="text-center py-6 text-xs text-gray-500 bg-white/5 rounded-xl border border-dashed border-white/10">
-                                    No custom types yet
-                                </div>
-                            )}
+                                ))}
+                                {subjects.length === 0 && (
+                                    <div className="text-center py-6 text-xs text-gray-500 bg-white/5 rounded-xl border border-dashed border-white/10">
+                                        No subjects defined
+                                    </div>
+                                )}
+                            </div>
+
+                            <Button variant="secondary" onClick={addSubject} className="w-full py-2.5 text-sm border-dashed border-2 border-white/10 hover:border-accent-purple/50 hover:text-accent-purple">
+                                + Add New Subject
+                            </Button>
+                            <div className="h-px bg-white/5 my-6" />
                         </div>
 
-                        <Button variant="secondary" onClick={addStudyType} className="w-full py-2.5 text-sm border-dashed border-2 border-white/10 hover:border-accent-blue/50 hover:text-accent-blue">
-                            + Add New Study Type
-                        </Button>
+                        {/* Study Types Section */}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-xl font-bold text-white">Study Types</h2>
+                                <Button variant="success" onClick={handleSaveStudyTypes} className="px-4 py-1.5 text-sm">Save Changes</Button>
+                            </div>
+                            <p className="text-gray-400 text-xs">Define your custom study categories (e.g., Theory, Practical).</p>
+
+                            <div className="space-y-2.5">
+                                {studyTypes.map((type) => (
+                                    <div key={type.key} className="flex gap-2 group">
+                                        <div className="flex-1 relative">
+                                            <input
+                                                type="text"
+                                                value={type.name}
+                                                onChange={(e) => setStudyTypes(studyTypes.map((t) => t.key === type.key ? { ...t, name: e.target.value } : t))}
+                                                className="w-full px-3 py-2.5 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:border-accent-blue focus:ring-1 focus:ring-accent-blue transition-all"
+                                                placeholder="Type Name (e.g. Lab Work)"
+                                            />
+                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-accent-blue/50"></div>
+                                        </div>
+                                        <button
+                                            onClick={() => removeStudyType(type.key)}
+                                            className="p-2.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all border border-transparent hover:border-red-500/20"
+                                            title="Remove"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                ))}
+                                {studyTypes.length === 0 && (
+                                    <div className="text-center py-6 text-xs text-gray-500 bg-white/5 rounded-xl border border-dashed border-white/10">
+                                        No custom types yet
+                                    </div>
+                                )}
+                            </div>
+
+                            <Button variant="secondary" onClick={addStudyType} className="w-full py-2.5 text-sm border-dashed border-2 border-white/10 hover:border-accent-blue/50 hover:text-accent-blue">
+                                + Add New Study Type
+                            </Button>
+                        </div>
                     </div>
                 )}
 

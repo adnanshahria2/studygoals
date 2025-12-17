@@ -17,7 +17,8 @@ export const TargetCard: React.FC<TargetCardProps> = ({
     cardMeta, dateData, completedTopics,
     onAddTopic, onEditTopic, onEditCard, onDeleteCard
 }) => {
-    const columns = COLUMN_HEADERS.table1;
+    const { updateTopic, settings } = useData();
+    const columns = (settings.subjects && settings.subjects.length > 0) ? settings.subjects : COLUMN_HEADERS.table1;
 
     // Calculate progress stats
     const { totalTopics, completedCount, percentage } = useMemo(() => {
@@ -50,7 +51,7 @@ export const TargetCard: React.FC<TargetCardProps> = ({
         return { totalDays, daysRemaining: Math.max(0, daysRemaining), timeProgress };
     }, [cardMeta.startDate, cardMeta.endDate]);
 
-    const { updateTopic } = useData();
+
     const PROGRESS_STEPS = [0, 20, 40, 60, 80, 100];
 
     const handleProgressClick = (e: React.MouseEvent, topic: Topic, topicId: string) => {

@@ -30,7 +30,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
         title: 'Countdown to Goal',
         targetDate: '2025-12-31',
         targetTime: '00:00'
-    }
+    },
+    subjects: COLUMN_HEADERS.table1
 };
 
 export const DEFAULT_TABLE_DATA: TableData = {
