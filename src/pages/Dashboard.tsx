@@ -64,12 +64,12 @@ export const Dashboard: React.FC = () => {
         activeTopicIds.forEach(id => {
             const topic = completedTopics[id];
             if (topic) {
-                possible += 100;
-                achieved += topic.progress;
+                possible += 1;
+                if (topic.progress === 100) achieved += 1;
             }
         });
 
-        return { totalMarksAchieved: achieved, totalMarksPossible: possible || 1 };
+        return { totalMarksAchieved: achieved, totalMarksPossible: possible };
     }, [tableData, completedTopics]);
 
     // Get sorted dates for Daily Plan
@@ -207,7 +207,7 @@ export const Dashboard: React.FC = () => {
                                     <div className="h-2 bg-black/40 rounded-full overflow-hidden">
                                         <div
                                             className="h-full bg-accent-green transition-all duration-1000 ease-out relative overflow-hidden"
-                                            style={{ width: `${(totalMarksAchieved / totalMarksPossible) * 100}%` }}
+                                            style={{ width: `${totalMarksPossible > 0 ? (totalMarksAchieved / totalMarksPossible) * 100 : 0}%` }}
                                         >
                                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
                                         </div>
