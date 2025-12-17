@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal } from '@/components/common/Modal';
 import { Button } from '@/components/common/Button';
 import { Dropdown } from '@/components/common/Dropdown';
@@ -15,23 +15,35 @@ interface AddTopicModalProps {
 
 export const AddTopicModal: React.FC<AddTopicModalProps> = ({ isOpen, onClose, tableId, date }) => {
     const { settings, addTopic, tableData } = useData();
+
+    // Compute columns first - this must match what's used in the dropdown
+    const columns = tableId === 'table1'
+        ? (settings.subjects && settings.subjects.length > 0 ? settings.subjects : COLUMN_HEADERS.table1)
+        : (COLUMN_HEADERS[tableId as keyof typeof COLUMN_HEADERS] || COLUMN_HEADERS.table2);
+
     const [name, setName] = useState('');
     const [timedNote, setTimedNote] = useState('');
     const [estimatedTime, setEstimatedTime] = useState('');
-    const defaultColumns = COLUMN_HEADERS[tableId as keyof typeof COLUMN_HEADERS] || COLUMN_HEADERS.table2;
-    const [column, setColumn] = useState(defaultColumns[0] || '');
+    const [column, setColumn] = useState(columns[0] || '');
     const [hardness, setHardness] = useState('medium');
     const [studyStatus, setStudyStatus] = useState(settings.customStudyTypes?.[0]?.key || 'new');
     const [priority, setPriority] = useState<'high' | 'medium' | 'low'>('low');
+
+    // Sync column state when modal opens or columns change
+    useEffect(() => {
+        if (isOpen && columns.length > 0) {
+            // Only reset if current column is not in the new columns list
+            if (!columns.includes(column)) {
+                setColumn(columns[0]);
+            }
+        }
+    }, [isOpen, columns, column]);
 
     // Sync Logic: Check if current date falls within any Target Card
     const targetCardMatch = tableId === 'table2' ? (tableData.targetCards || []).find(card => {
         const start = new Date(card.startDate);
         const end = new Date(card.endDate);
 
-        // Actually, date passed to modal from DateCard is likely YYYY-MM-DD.
-        // Let's use simple string comparison if format matches, or Date objects.
-        // Safer to use Date objects.
         // Parse date safely
         let d = new Date(date);
         if (isNaN(d.getTime()) && date.includes('/')) {
@@ -74,17 +86,13 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({ isOpen, onClose, t
         onClose();
     };
 
-    const columns = tableId === 'table1'
-        ? (settings.subjects && settings.subjects.length > 0 ? settings.subjects : COLUMN_HEADERS.table1)
-        : COLUMN_HEADERS[tableId as keyof typeof COLUMN_HEADERS];
-
     const columnOptions = columns.map((c) => ({ value: c, label: c }));
     const hardnessOptions = [
         { value: 'easy', label: 'Easy' },
         { value: 'medium', label: 'Medium' },
         { value: 'hard', label: 'Hard' }
     ];
-    const studyOptions = settings.customStudyTypes.map((t) => ({ value: t.key, label: t.name }));
+    const studyOptions = (settings.customStudyTypes || []).map((t) => ({ value: t.key, label: t.name }));
 
     return (
         <Modal
