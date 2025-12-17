@@ -100,7 +100,7 @@ export const SettingsContent: React.FC<SettingsContentProps> = ({ onLogout }) =>
                 ))}
 
                 <div className="hidden md:block mt-auto pt-4 border-t border-white/5">
-                    <div className="px-2 mb-2 text-[10px] text-gray-600">StudyGoals V1.0</div>
+                    <div className="px-2 mb-2 text-[10px] text-gray-600">StudyGoals v1.3</div>
                 </div>
             </div>
 
@@ -291,7 +291,7 @@ export const SettingsContent: React.FC<SettingsContentProps> = ({ onLogout }) =>
                             </div>
 
                             <div className="pt-4 text-[10px] text-gray-500 font-mono">
-                                v1.0.1 • StudyGoals Inc
+                                v1.3 • StudyGoals Inc
                             </div>
                         </div>
                     </div>
