@@ -14,25 +14,33 @@
     <link rel="apple-touch-icon" href="./icons/icon-192.png" />
     <title>StudyGoals</title>
     <script>
-        window.onerror = function(msg, url, line, col, error) {
+        window.onerror = function (msg, url, line, col, error) {
             var errorMsg = 'Global Error: ' + msg + '\n' + url + ':' + line + ':' + col;
             console.error(errorMsg);
             // Display on screen for user to see
             var root = document.getElementById('root');
-            if(root) {
+            if (root) {
                 root.innerHTML = '<div style="color:red;padding:20px;background:black;font-family:monospace;white-space:pre-wrap;word-break:break-all;z-index:9999;position:relative;">' + errorMsg + '</div>';
             }
             alert(errorMsg);
             return false;
         };
-        window.addEventListener('unhandledrejection', function(event) {
+        window.addEventListener('unhandledrejection', function (event) {
             alert('Unhandled Promise: ' + event.reason);
         });
     </script>
 </head>
 
 <body>
-    <div id="root"></div>
+    <div id="root">
+        <div id="loading-screen"
+            style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#0a0f1a;color:white;font-family:sans-serif;">
+            <div style="font-size:24px;margin-bottom:10px;">StudyGoals</div>
+            <div style="font-size:14px;color:#888;">Loading...</div>
+            <div style="margin-top:20px;font-size:10px;color:#666;">If you see this for more than 5 seconds, clear site
+                cache.</div>
+        </div>
+    </div>
     <script type="module" src="./src/main.tsx"></script>
 </body>
 

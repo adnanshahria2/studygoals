@@ -80,8 +80,10 @@ export default defineConfig({
         ]
       },
       devOptions: {
-        enabled: true
-      }
+        enabled: false
+      },
+      // TEMPORARY: Disable SW registration for debugging mobile blank screen
+      selfDestroying: true
     })
   ],
   base: '/studygoals/',
