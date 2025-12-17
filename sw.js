@@ -1,2 +1,25 @@
-if(!self.define){let e,s={};const n=(n,i)=>(n=new URL(n+".js",i).href,s[n]||new Promise(s=>{if("document"in self){const e=document.createElement("script");e.src=n,e.onload=s,document.head.appendChild(e)}else e=n,importScripts(n),s()}).then(()=>{let e=s[n];if(!e)throw new Error(`Module ${n} didn’t register its module`);return e}));self.define=(i,o)=>{const c=e||("document"in self?document.currentScript.src:"")||location.href;if(s[c])return;let t={};const r=e=>n(e,c),a={module:{uri:c},exports:t,require:r};s[c]=Promise.all(i.map(e=>a[e]||r(e))).then(e=>(o(...e),t))}}define(["./workbox-354287e6"],function(e){"use strict";self.skipWaiting(),e.clientsClaim(),e.precacheAndRoute([{url:"vite.svg",revision:"8e3a10e157f75ada21ab742c022d5430"},{url:"index.html",revision:"1058e48e23fdcd2c08db50bde6bc2a1e"},{url:"icons/icon-512.png",revision:"623c6e0b22e5a3c2ec0a7e8b38a0bc40"},{url:"icons/icon-192.png",revision:"623c6e0b22e5a3c2ec0a7e8b38a0bc40"},{url:"assets/workbox-window.prod.es5-CcvICf7O.js",revision:null},{url:"assets/index-I1tzSfoL.css",revision:null},{url:"assets/index-Cc0C-t97.js",revision:null},{url:"vite.svg",revision:"8e3a10e157f75ada21ab742c022d5430"},{url:"icons/icon-192.png",revision:"623c6e0b22e5a3c2ec0a7e8b38a0bc40"},{url:"icons/icon-512.png",revision:"623c6e0b22e5a3c2ec0a7e8b38a0bc40"},{url:"manifest.webmanifest",revision:"8e39c8745fc2232fed722ae140ed705e"}],{}),e.cleanupOutdatedCaches(),e.registerRoute(new e.NavigationRoute(e.createHandlerBoundToURL("index.html"))),e.registerRoute(/^https:\/\/firestore\.googleapis\.com\/.*/i,new e.NetworkFirst({cacheName:"firestore-cache",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:50,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/^https:\/\/fonts\.googleapis\.com\/.*/i,new e.CacheFirst({cacheName:"google-fonts-stylesheets",plugins:[new e.ExpirationPlugin({maxEntries:10,maxAgeSeconds:604800})]}),"GET"),e.registerRoute(/^https:\/\/fonts\.gstatic\.com\/.*/i,new e.CacheFirst({cacheName:"google-fonts-webfonts",plugins:[new e.ExpirationPlugin({maxEntries:30,maxAgeSeconds:31536e3})]}),"GET")});
-//# sourceMappingURL=sw.js.map
+
+self.addEventListener('install', (e) => {
+  self.skipWaiting();
+});
+self.addEventListener('activate', (e) => {
+  self.registration.unregister()
+    .then(() => self.clients.matchAll())
+    .then((clients) => {
+      clients.forEach((client) => {
+        if (client instanceof WindowClient)
+          client.navigate(client.url);
+      });
+      return Promise.resolve();
+    })
+    .then(() => {
+      self.caches.keys().then((cacheNames) => {
+        Promise.all(
+          cacheNames.map((cacheName) => {
+            return self.caches.delete(cacheName);
+          }),
+        );
+      })
+    });
+});
+    
