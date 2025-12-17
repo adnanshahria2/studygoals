@@ -13,8 +13,24 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="apple-touch-icon" href="./icons/icon-192.png" />
     <title>StudyGoals</title>
-  <script type="module" crossorigin src="/studygoals/assets/index-DcSIqlrd.js"></script>
-  <link rel="stylesheet" crossorigin href="/studygoals/assets/index-B4U1Z47z.css">
+    <script>
+        window.onerror = function(msg, url, line, col, error) {
+            var errorMsg = 'Global Error: ' + msg + '\n' + url + ':' + line + ':' + col;
+            console.error(errorMsg);
+            // Display on screen for user to see
+            var root = document.getElementById('root');
+            if(root) {
+                root.innerHTML = '<div style="color:red;padding:20px;background:black;font-family:monospace;white-space:pre-wrap;word-break:break-all;z-index:9999;position:relative;">' + errorMsg + '</div>';
+            }
+            alert(errorMsg);
+            return false;
+        };
+        window.addEventListener('unhandledrejection', function(event) {
+            alert('Unhandled Promise: ' + event.reason);
+        });
+    </script>
+  <script type="module" crossorigin src="/studygoals/assets/index-Cc0C-t97.js"></script>
+  <link rel="stylesheet" crossorigin href="/studygoals/assets/index-I1tzSfoL.css">
 <link rel="manifest" href="/studygoals/manifest.webmanifest"></head>
 
 <body>
