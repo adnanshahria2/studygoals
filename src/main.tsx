@@ -5,13 +5,16 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './contexts/ToastContext';
 import './index.css';
 
-console.log("🚀 Loaded StudyGoals Version: 1.1 (UI Refinements & Hidden Columns)");
+import { ReloadPrompt } from './components/ReloadPrompt';
+
+console.log("🚀 Loaded StudyGoals Version: 1.2 (PWA Updates + Progress Bar Removed)");
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ToastProvider>
       <AuthProvider>
         <App />
+        <ReloadPrompt />
       </AuthProvider>
     </ToastProvider>
   </React.StrictMode>

@@ -200,18 +200,9 @@ export const Dashboard: React.FC = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
                                     </svg>
                                 </div>
-                                <div className="flex-1">
-                                    <div className="flex justify-end text-sm mb-1">
-                                        <span className="font-mono font-bold text-accent-green">{totalMarksAchieved}/{totalMarksPossible}</span>
-                                    </div>
-                                    <div className="h-2 bg-black/40 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-accent-green transition-all duration-1000 ease-out relative overflow-hidden"
-                                            style={{ width: `${totalMarksPossible > 0 ? (totalMarksAchieved / totalMarksPossible) * 100 : 0}%` }}
-                                        >
-                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
-                                        </div>
-                                    </div>
+                                <div className="flex flex-col justify-center h-full">
+                                    <span className="text-xs text-gray-400">Tasks Done</span>
+                                    <span className="font-mono font-bold text-accent-green text-lg leading-none">{totalMarksAchieved}/{totalMarksPossible}</span>
                                 </div>
                             </div>
 
