@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Topic, ColumnData, TargetCardMeta } from '@/types';
-import { COLUMN_HEADERS } from '@/constants';
+import { COLUMN_HEADERS, STUDY_TYPE_CLASSES } from '@/constants';
 import { useData } from '@/contexts/DataContext';
 
 interface TargetCardProps {
@@ -199,6 +199,11 @@ export const TargetCard: React.FC<TargetCardProps> = ({
                                                 {topic.estimatedTime && (
                                                     <span className="text-[10px] text-accent-purple truncate font-mono flex items-center gap-1 mt-0.5">
                                                         <span className="text-xs">⏰</span> {topic.estimatedTime}
+                                                    </span>
+                                                )}
+                                                {topic.studyStatus && (
+                                                    <span className={`text-[10px] px-1.5 py-0.5 rounded border mt-1 inline-block ${STUDY_TYPE_CLASSES[topic.studyStatus] || STUDY_TYPE_CLASSES.custom}`}>
+                                                        {settings.customStudyTypes?.find(t => t.key === topic.studyStatus)?.name || topic.studyStatus}
                                                     </span>
                                                 )}
                                             </div>

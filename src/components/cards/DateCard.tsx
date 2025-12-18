@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Topic, ColumnData } from '@/types';
-import { COLUMN_HEADERS } from '@/constants';
+import { COLUMN_HEADERS, STUDY_TYPE_CLASSES } from '@/constants';
 import { useData } from '@/contexts/DataContext';
 
 interface DateCardProps {
@@ -19,7 +19,7 @@ export const DateCard: React.FC<DateCardProps> = ({
     tableId, date, dateData, completedTopics,
     onAddTopic, onEditTopic, onDeleteCard, onDateChange
 }) => {
-    const { tableData, updateTableData, updateTopic } = useData();
+    const { tableData, updateTableData, updateTopic, settings } = useData();
     const [showPullModal, setShowPullModal] = useState(false);
     const [selectedColumn, setSelectedColumn] = useState<string | null>(null);
 
@@ -204,6 +204,11 @@ export const DateCard: React.FC<DateCardProps> = ({
                                                 {topic.estimatedTime && (
                                                     <span className="text-[10px] text-accent-purple truncate font-mono flex items-center gap-1 mt-0.5">
                                                         <span className="text-xs">⏰</span> {topic.estimatedTime}
+                                                    </span>
+                                                )}
+                                                {topic.studyStatus && (
+                                                    <span className={`text-[10px] px-1.5 py-0.5 rounded border mt-1 inline-block ${STUDY_TYPE_CLASSES[topic.studyStatus] || STUDY_TYPE_CLASSES.custom}`}>
+                                                        {settings.customStudyTypes?.find(t => t.key === topic.studyStatus)?.name || topic.studyStatus}
                                                     </span>
                                                 )}
                                             </div>
