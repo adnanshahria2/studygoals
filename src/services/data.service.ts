@@ -11,6 +11,14 @@ const LOCAL_DATA_KEY = 'studygoals_data_cache';
 const LOCAL_SETTINGS_KEY = 'studygoals_settings_cache';
 const LOCAL_PENDING_SYNC_KEY = 'studygoals_pending_sync';
 
+// Queue for offline data sync
+interface PendingSync {
+    type: 'data' | 'settings';
+    userId: string;
+    payload: unknown;
+    timestamp: number;
+}
+
 // Helper to save data to localStorage for offline access
 const saveToLocalStorage = (key: string, data: unknown): void => {
     try {
@@ -38,6 +46,13 @@ export const isOnline = (): boolean => {
     return navigator.onLine;
 };
 
+// Check if there are pending syncs for a specific type/userId
+const getPendingSync = (type: 'data' | 'settings', userId: string): PendingSync | undefined => {
+    const pending = loadFromLocalStorage<PendingSync[]>(LOCAL_PENDING_SYNC_KEY, []);
+    // Find the LATEST pending sync for this type
+    return pending.filter(p => p.type === type && p.userId === userId).sort((a, b) => b.timestamp - a.timestamp)[0];
+};
+
 // Subscribe to user data with offline fallback
 export const subscribeToData = (
     userEmail: string,
@@ -49,14 +64,34 @@ export const subscribeToData = (
     const localCacheKey = `${LOCAL_DATA_KEY}_${userId}`;
 
     // Load from local cache immediately for fast startup
-    const cachedData = loadFromLocalStorage<AppData | null>(localCacheKey, null);
-    if (cachedData) {
+    // CHECK FOR PENDING SYNC FIRST: If we have pending changes, they are the source of truth!
+    const pendingSync = getPendingSync('data', userId);
+    let cachedData = loadFromLocalStorage<AppData | null>(localCacheKey, null);
+
+    if (pendingSync) {
+        // If we have pending data, use it. It's newer than anything in cache or server (functionally) because it hasn't synced yet.
+        const pendingPayload = pendingSync.payload as { tableData: TableData, completedTopics: CompletedTopics };
+        cachedData = {
+            tableData: pendingPayload.tableData,
+            completedTopics: pendingPayload.completedTopics
+        };
+        console.log('Using pending offline data as source of truth');
+        onData(cachedData);
+    } else if (cachedData) {
         onData(cachedData);
     }
 
     return onSnapshot(
         dataRef,
         (snapshot) => {
+            // CRITICAL: If we have pending syncs, IGNORE the snapshot until the sync is processed.
+            // The snapshot might be from the "server" or "offline cache" but it doesn't know about our local edits yet.
+            const currentPending = getPendingSync('data', userId);
+            if (currentPending) {
+                console.log('Ignoring Firestore snapshot due to pending local changes');
+                return;
+            }
+
             if (snapshot.exists()) {
                 const data = snapshot.data();
                 const appData: AppData = {
@@ -96,15 +131,29 @@ export const subscribeToSettings = (
     const settingsRef = doc(db, getSettingsPath(userId));
     const localCacheKey = `${LOCAL_SETTINGS_KEY}_${userId}`;
 
-    // Load from local cache immediately
-    const cachedSettings = loadFromLocalStorage<AppSettings | null>(localCacheKey, null);
-    if (cachedSettings) {
+    // CHECK FOR PENDING SYNC FIRST
+    const pendingSync = getPendingSync('settings', userId);
+    let cachedSettings = loadFromLocalStorage<AppSettings | null>(localCacheKey, null);
+
+    if (pendingSync) {
+        const pendingPayload = pendingSync.payload as AppSettings;
+        cachedSettings = pendingPayload;
+        console.log('Using pending offline settings as source of truth');
+        onSettings(cachedSettings);
+    } else if (cachedSettings) {
         onSettings(cachedSettings);
     }
 
     return onSnapshot(
         settingsRef,
         (snapshot) => {
+            // CRITICAL: If we have pending syncs, IGNORE the snapshot
+            const currentPending = getPendingSync('settings', userId);
+            if (currentPending) {
+                console.log('Ignoring Firestore snapshot due to pending local settings');
+                return;
+            }
+
             if (snapshot.exists()) {
                 const data = snapshot.data() as AppSettings;
                 const settings: AppSettings = {
@@ -130,14 +179,6 @@ export const subscribeToSettings = (
     );
 };
 
-// Queue for offline data sync
-interface PendingSync {
-    type: 'data' | 'settings';
-    userId: string;
-    payload: unknown;
-    timestamp: number;
-}
-
 // Add to pending sync queue
 const addToPendingSync = (sync: Omit<PendingSync, 'timestamp'>): void => {
     try {
@@ -160,6 +201,7 @@ export const processPendingSync = async (): Promise<void> => {
 
     const remaining: PendingSync[] = [];
 
+    // Process sequentially to ensure order
     for (const sync of pending) {
         try {
             if (sync.type === 'data') {
@@ -171,13 +213,18 @@ export const processPendingSync = async (): Promise<void> => {
                 const settingsRef = doc(db, getSettingsPath(sync.userId));
                 await setDoc(settingsRef, settings, { merge: true });
             }
-        } catch {
+        } catch (error) {
+            console.error('Sync failed for item', error);
             // Keep in pending queue if failed
             remaining.push(sync);
         }
     }
 
     saveToLocalStorage(LOCAL_PENDING_SYNC_KEY, remaining);
+
+    // After sync is done, we might want to trigger a "refresh" of the subscriptions, 
+    // but typically the write to Firestore will trigger the onSnapshot update automatically
+    // which will then finally update our local cache with the "canonical" server version.
 };
 
 // Save data with offline support
@@ -199,6 +246,9 @@ export const saveData = async (
     }
 
     const dataRef = doc(db, getDataPath(userId));
+    // If we are online, we write. But we ALSO check if we have other pending syncs that need to go first?
+    // Ideally processPendingSync should operate independently. 
+    // For simplicity, we just write.
     await setDoc(dataRef, { tableData, completedTopics }, { merge: false });
 };
 
