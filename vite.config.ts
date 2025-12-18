@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',
       includeAssets: ['icons/*.png', 'vite.svg'],
       manifest: {
         name: 'StudyGoals - Study Progress Tracker',
@@ -47,23 +47,38 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2,json}'],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
+        // Enable navigation preload for faster page loads
+        navigationPreload: true,
+        // Handle navigation requests (SPA routing)
+        navigateFallback: 'index.html',
+        navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/firestore\.googleapis\.com\/.*/i,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'firestore-cache',
-              expiration: { maxEntries: 50, maxAgeSeconds: 86400 },
-              networkTimeoutSeconds: 10
+              expiration: { maxEntries: 100, maxAgeSeconds: 86400 * 7 },
+              networkTimeoutSeconds: 5,
+              cacheableResponse: { statuses: [0, 200] }
+            }
+          },
+          {
+            urlPattern: /^https:\/\/identitytoolkit\.googleapis\.com\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'firebase-auth-cache',
+              expiration: { maxEntries: 10, maxAgeSeconds: 86400 },
+              networkTimeoutSeconds: 5
             }
           },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'CacheFirst',
+            handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'google-fonts-stylesheets',
               expiration: { maxEntries: 10, maxAgeSeconds: 604800 }
@@ -74,13 +89,15 @@ export default defineConfig({
             handler: 'CacheFirst',
             options: {
               cacheName: 'google-fonts-webfonts',
-              expiration: { maxEntries: 30, maxAgeSeconds: 31536000 }
+              expiration: { maxEntries: 30, maxAgeSeconds: 31536000 },
+              cacheableResponse: { statuses: [0, 200] }
             }
           }
         ]
       },
       devOptions: {
-        enabled: false
+        enabled: false,
+        type: 'module'
       }
     })
   ],

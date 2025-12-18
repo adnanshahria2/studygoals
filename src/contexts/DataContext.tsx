@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useRef } from 'react';
 import { AppSettings, TableData, CompletedTopics, Topic, TargetCardMeta } from '@/types';
 import { DEFAULT_SETTINGS, DEFAULT_TABLE_DATA } from '@/constants';
-import { subscribeToData, subscribeToSettings, saveData, saveSettings } from '@/services/data.service';
+import { subscribeToData, subscribeToSettings, saveData, saveSettings, isOnline, processPendingSync } from '@/services/data.service';
 import { useAuth } from './AuthContext';
 import { useToastContext } from './ToastContext';
 
@@ -10,6 +10,7 @@ interface DataContextType {
     completedTopics: CompletedTopics;
     settings: AppSettings;
     isLoading: boolean;
+    isOffline: boolean;
     updateTopic: (topicId: string, updates: Partial<Topic>) => void;
     addTopic: (tableId: string, date: string, column: string, topic: Topic, customTopicId?: string) => string;
     deleteTopic: (topicId: string) => void;
@@ -32,9 +33,31 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [completedTopics, setCompletedTopics] = useState<CompletedTopics>({});
     const [settings, setSettings] = useState<AppSettings>({ ...DEFAULT_SETTINGS });
     const [isLoading, setIsLoading] = useState(true);
+    const [isOfflineState, setIsOfflineState] = useState(!isOnline());
 
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const pendingLocalChangeRef = useRef<boolean>(false);
+
+    // Track online/offline status
+    useEffect(() => {
+        const handleOnline = () => {
+            setIsOfflineState(false);
+            showToast('success', 'Back online');
+            processPendingSync();
+        };
+        const handleOffline = () => {
+            setIsOfflineState(true);
+            showToast('info', 'You are offline');
+        };
+
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+
+        return () => {
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
+        };
+    }, [showToast]);
 
     // Subscribe to data when user changes
     useEffect(() => {
@@ -246,7 +269,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     return (
         <DataContext.Provider value={{
-            tableData, completedTopics, settings, isLoading,
+            tableData, completedTopics, settings, isLoading, isOffline: isOfflineState,
             updateTopic, addTopic, deleteTopic, updateTableData, updateSettings, addCard, deleteCard,
             addTargetCard, updateTargetCard, deleteTargetCard
         }}>

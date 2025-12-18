@@ -2,10 +2,10 @@ import React from 'react';
 import { useToastContext } from '@/contexts/ToastContext';
 
 const toastStyles = {
-    success: 'bg-accent-green text-white border-green-600',
-    error: 'bg-accent-red text-white border-red-600',
-    info: 'bg-bg-card text-white border-border-light',
-    syncing: 'bg-white text-gray-900 border-gray-300'
+    success: 'bg-accent-green text-white border-green-600 px-4 py-3',
+    error: 'bg-accent-red text-white border-red-600 px-4 py-3',
+    info: 'bg-bg-card text-white border-border-light px-4 py-3',
+    syncing: 'bg-white/90 text-gray-700 border-gray-200 px-2.5 py-1.5 text-xs'
 };
 
 export const Toast: React.FC = () => {
@@ -19,14 +19,14 @@ export const Toast: React.FC = () => {
                 <div
                     key={toast.id}
                     className={`
-            flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg
+            flex items-center gap-2 rounded-lg border shadow-lg
             animate-slideUp cursor-pointer transition-transform hover:scale-105
             ${toastStyles[toast.type]}
           `}
                     onClick={() => removeToast(toast.id)}
                 >
                     {toast.type === 'syncing' && (
-                        <span className="w-4 h-4 border-2 border-gray-600 border-t-transparent rounded-full animate-spin" />
+                        <span className="w-3 h-3 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
                     )}
                     {toast.type === 'success' && (
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,7 +38,7 @@ export const Toast: React.FC = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     )}
-                    <span className="font-semibold">{toast.message}</span>
+                    <span className={toast.type === 'syncing' ? 'font-medium' : 'font-semibold'}>{toast.message}</span>
                 </div>
             ))}
         </div>
