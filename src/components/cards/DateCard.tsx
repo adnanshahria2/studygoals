@@ -206,14 +206,18 @@ export const DateCard: React.FC<DateCardProps> = ({
                                                         <span className="text-xs">⏰</span> {topic.estimatedTime}
                                                     </span>
                                                 )}
-                                                {topic.studyStatus && (
-                                                    <span className={`text-[10px] px-1.5 py-0.5 rounded border mt-1 inline-block ${STUDY_TYPE_CLASSES[topic.studyStatus] || STUDY_TYPE_CLASSES.custom}`}>
-                                                        {settings.customStudyTypes?.find(t => t.key === topic.studyStatus)?.name || topic.studyStatus}
-                                                    </span>
-                                                )}
                                             </div>
+                                            {/* Study Type Mini Badge - Right Side */}
+                                            {topic.studyStatus && (
+                                                <span
+                                                    className={`flex-shrink-0 px-1 py-0.5 rounded text-[7px] font-bold uppercase tracking-wide border opacity-70 ${STUDY_TYPE_CLASSES[topic.studyStatus] || STUDY_TYPE_CLASSES.custom}`}
+                                                    title={settings.customStudyTypes?.find(t => t.key === topic.studyStatus)?.name || topic.studyStatus}
+                                                >
+                                                    {(settings.customStudyTypes?.find(t => t.key === topic.studyStatus)?.name || topic.studyStatus).substring(0, 3).toUpperCase()}
+                                                </span>
+                                            )}
                                             <span
-                                                className={`text-xs font-mono font-medium ${topic.progress === 100 ? 'text-green-500' : 'text-gray-500'}`}
+                                                className={`text-xs font-mono font-medium flex-shrink-0 ${topic.progress === 100 ? 'text-green-500' : 'text-gray-500'}`}
                                             >
                                                 {topic.progress}%
                                             </span>
