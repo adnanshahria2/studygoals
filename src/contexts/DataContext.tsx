@@ -214,10 +214,14 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setTableData((prev) => {
             if (prev[tableId][date]) return prev;
             const updated = { ...prev, [tableId]: { ...prev[tableId], [date]: {} } };
-            debouncedSave(updated, completedTopics);
+            // Use functional update to get current completedTopics
+            setCompletedTopics(currentTopics => {
+                debouncedSave(updated, currentTopics);
+                return currentTopics;
+            });
             return updated;
         });
-    }, [completedTopics, debouncedSave]);
+    }, [debouncedSave]);
 
     const addTargetCard = useCallback((title: string, startDate: string, endDate: string): string => {
         const cardId = `target_${Date.now().toString(36)}${Math.random().toString(36).substr(2, 5)}`;
@@ -226,15 +230,17 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setTableData((prev) => {
             const updated = {
                 ...prev,
-                // table1 no longer used for targets. Target data is now in card.data (initialized above)
                 targetCards: [...(prev.targetCards || []), newCard]
             };
-            debouncedSave(updated, completedTopics);
+            setCompletedTopics(currentTopics => {
+                debouncedSave(updated, currentTopics);
+                return currentTopics;
+            });
             return updated;
         });
 
         return cardId;
-    }, [completedTopics, debouncedSave]);
+    }, [debouncedSave]);
 
     const updateTargetCard = useCallback((cardId: string, updates: { title?: string; startDate?: string; endDate?: string }) => {
         setTableData((prev) => {
@@ -242,30 +248,39 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             updated.targetCards = (updated.targetCards || []).map(card =>
                 card.id === cardId ? { ...card, ...updates } : card
             );
-            debouncedSave(updated, completedTopics);
+            setCompletedTopics(currentTopics => {
+                debouncedSave(updated, currentTopics);
+                return currentTopics;
+            });
             return updated;
         });
-    }, [completedTopics, debouncedSave]);
+    }, [debouncedSave]);
 
     const deleteTargetCard = useCallback((cardId: string) => {
         setTableData((prev) => {
             const updated = JSON.parse(JSON.stringify(prev)) as TableData;
             delete updated.table1[cardId];
             updated.targetCards = (updated.targetCards || []).filter(c => c.id !== cardId);
-            debouncedSave(updated, completedTopics);
+            setCompletedTopics(currentTopics => {
+                debouncedSave(updated, currentTopics);
+                return currentTopics;
+            });
             return updated;
         });
-    }, [completedTopics, debouncedSave]);
+    }, [debouncedSave]);
 
     const deleteCard = useCallback((tableId: string, cardId: string) => {
         const table = tableId as 'table1' | 'table2';
         setTableData((prev) => {
             const updated = JSON.parse(JSON.stringify(prev)) as TableData;
             delete updated[table][cardId];
-            debouncedSave(updated, completedTopics);
+            setCompletedTopics(currentTopics => {
+                debouncedSave(updated, currentTopics);
+                return currentTopics;
+            });
             return updated;
         });
-    }, [completedTopics, debouncedSave]);
+    }, [debouncedSave]);
 
     return (
         <DataContext.Provider value={{

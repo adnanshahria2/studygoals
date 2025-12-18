@@ -3,7 +3,6 @@ import { LoginScreen } from '@/components/auth/LoginScreen';
 import { Dashboard } from '@/pages/Dashboard';
 import { Toast } from '@/components/common/Toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { DataProvider } from '@/contexts/DataContext';
 
 export const App: React.FC = () => {
   const { user, isLoading } = useAuth();
@@ -29,9 +28,10 @@ export const App: React.FC = () => {
   }
 
   return (
-    <DataProvider>
+    <>
       <Dashboard />
       <Toast />
-    </DataProvider>
+    </>
   );
 };
+

@@ -221,12 +221,3 @@ export const saveSettings = async (
     const settingsRef = doc(db, getSettingsPath(userId));
     await setDoc(settingsRef, settings, { merge: true });
 };
-
-// Initialize online/offline listener
-if (typeof window !== 'undefined') {
-    window.addEventListener('online', () => {
-        console.log('Back online - processing pending syncs');
-        processPendingSync();
-    });
-}
-
